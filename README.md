@@ -164,23 +164,7 @@ Visit http://192.168.99.100/credentials/store/system/domain/_/newCredentials
 Enter the token value in the `Password` field.  The `Username` field's value should be your GitHub account.  All other field values are flexible.
 
 
-## Further reading
+## More reading
 
 * Trying to run a "sibling" Docker process as described [here](http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/#the-solution).
 * Executing a GitHub pipeline with `Jenkinsfile` when using the [Cloudbees Docker Pipeline Plugin](https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-inside).
-
-### Sample golang build pipeline
-
-```
-node {
-  checkout scm
-  sh 'git rev-parse --short HEAD > .rev'
-  def rev = readFile('.rev').trim()
-
-  stage ('Run tests, build bin, and package as tarball') {
-    docker.image('golang:1.8-wheezy').inside {
-      sh 'make tarball'
-    }
-  }
-}
-```
