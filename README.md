@@ -116,8 +116,6 @@ cat /var/jenkins_home/secrets/initialAdminPassword
 
 where `{containerId}` is container id of `jenkins_master`.
 
-![startup-password](docs/startup-password.png)
-
 Enter the value in the `Administrator password` field and click `Continue`.
 
 
