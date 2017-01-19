@@ -8,13 +8,11 @@ services:
 
   data:
     build: jenkins-data
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   master:
     build: jenkins-master
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     volumes_from:
       - data
     ports:
@@ -22,8 +20,6 @@ services:
 
   nginx:
     build: jenkins-nginx
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "80:80"
     links:
@@ -31,5 +27,3 @@ services:
 
   slave:
     build: jenkins-slave
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro

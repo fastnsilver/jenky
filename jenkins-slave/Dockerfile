@@ -1,5 +1,5 @@
 FROM centos:7
-MAINTAINER Chris Phillipson
+MAINTAINER Chris Phillipson <fastnsilver@gmail.com>
 
 # Install Essentials
 RUN yum update -y && \

@@ -1,7 +1,17 @@
 # Jenky
 
+![](http://i.imgur.com/KC6TAD3.png)
+
 A configurable Docker-ized instance of Jenkins fronted by Nginx.
 Convenient for vetting builds in a local development environment.
+
+## Credits
+
+Standing on the shoulders of giants.
+
+I couldn't have scraped this together without
+* [A. J. Ricoveri](https://github.com/axltxl/docker-jenkins-dood)
+* [Riot Games Engineering](https://engineering.riotgames.com/news/jenkins-ephemeral-docker-tutorial)
 
 
 ## Prerequisites
@@ -100,7 +110,8 @@ To find it
 
 ```
 docker ps -a
-docker logs {containerId}
+docker exec -i -t {containerId} /bin/bash
+cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 where `{containerId}` is container id of `jenkins_master`.
@@ -155,10 +166,10 @@ Visit http://192.168.99.100/credentials/store/system/domain/_/newCredentials
 Enter the token value in the `Password` field.  The `Username` field's value should be your GitHub account.  All other field values are flexible.
 
 
-## // TODO
+## Further reading
 
 * Trying to run a "sibling" Docker process as described [here](http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/#the-solution).
-* Determine the feasibility of executing a GitHub pipeline with `Jenkinsfile` when using the [Cloudbees Docker Pipeline Plugin](https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-inside).
+* Executing a GitHub pipeline with `Jenkinsfile` when using the [Cloudbees Docker Pipeline Plugin](https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-inside).
 
 ### Sample golang build pipeline
 

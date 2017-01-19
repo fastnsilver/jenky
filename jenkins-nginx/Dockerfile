@@ -1,5 +1,5 @@
 FROM centos:centos7
-MAINTAINER Chris Phillipson
+MAINTAINER Chris Phillipson <fastnsilver@gmail.com>
 
 # Install NGINX
 RUN yum -y update; yum clean all
