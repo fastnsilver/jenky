@@ -1,0 +1,24 @@
+jclouds-jenkins
+token-macro durable-task
+docker-custom-build-environment
+docker-plugin
+docker-workflow
+blueocean
+blueocean-git-pipeline
+blueocean-github-pipeline
+bitbucket
+cloudbees-bitbucket-branch-source
+cloudbees-credentials
+gatling
+github
+golang
+jacoco
+jenkins-cloudformation-plugin
+junit
+maven-plugin
+marathon
+mesos
+sonar
+ssh-credentials
+swarm
+terraform
