@@ -11,12 +11,16 @@ Standing on the shoulders of giants.
 
 I couldn't have scraped this together without
 * [A. J. Ricoveri](https://github.com/axltxl/docker-jenkins-dood)
+* [Stefan Prodan](https://github.com/stefanprodan/jenkins)
 * [Riot Games Engineering](https://engineering.riotgames.com/news/jenkins-ephemeral-docker-tutorial)
+* [Ryan J. McDonough](https://damnhandy.com/2016/03/06/creating-containerized-build-environments-with-the-jenkins-pipeline-plugin-and-docker-well-almost/)
 
 
 ## Prerequisites
 
-* Docker
+* Docker for Mac
+
+If you happened to have previously installed [Docker Toolbox](https://www.docker.com/products/docker-toolbox), it will happily [co-exist](https://docs.docker.com/docker-for-mac/docker-toolbox/) with Docker for Mac.
 
 
 ## How to obtain the source
@@ -35,63 +39,9 @@ git clone https://github.com/fastnsilver/jenky.git
 git clone git@github.com:fastnsilver/jenky.git
 ```
 
-## Preparing Docker Machine for first use
+## Installing Docker for Mac
 
-Assuming you have installed VirtualBox, Docker Machine, Docker Compose and Docker.
-
-If not, it's highly recommended (on a Mac) to install each via [Homebrew](http://brew.sh/) with
-
-```
-brew tap caskroom/cask
-brew install brew-cask
-brew cask install virtualbox
-
-brew install docker-machine
-brew install docker-compose
-brew install docker
-```
-
-The instruction below provisions a Docker host named `dev` with 2 CPU, 10Gb RAM and 20Gb disk space
-
-```
-docker-machine create --driver virtualbox --virtualbox-cpu-count "2" --virtualbox-disk-size "20000" --virtualbox-memory "10240" dev
-```
-
-You could also execute the following script which will perform the first step above on your behalf
-
-```
-./provision.sh {1}
-```
-
-where `{1}` above would be replaced with whatever you want to name your docker-machine
-
-Caveat: You should have at least 12GB of memory and 25GB of disk space on your laptop or workstation.
-
-
-To begin using it (e.g., where machine name was `dev`)
-
-```
-eval $(docker-machine env dev)
-```
-
-
-Lastly, to destroy your docker machine, you could execute
-
-```
-./destroy.sh {1}
-```
-
-where `{1}` above would be replaced with an existing docker-machine name
-
-Caution! This will remove the VM hosting all your Docker images.
-
-
-## Notes on makefile
-
-| Command | Description |
-|---------|-------------|
-| `make build` | Builds images |
-| `make run` | Runs images |
+You're on a Mac (aren't you?). Install [Docker for Mac](https://download.docker.com/mac/stable/Docker.dmg).
 
 
 ## Prep Jenkins instance for first use
@@ -100,7 +50,7 @@ Caution! This will remove the VM hosting all your Docker images.
 ./bootstrap.sh
 ```
 
-Visit `http://192.168.99.100`.
+Visit `http://localhost`.
 
 You will be prompted to enter a password that is to be retrieved from startup log.
 
@@ -109,12 +59,9 @@ You will be prompted to enter a password that is to be retrieved from startup lo
 To find it
 
 ```
-docker ps -a
-docker exec -i -t {containerId} /bin/bash
+docker exec master /bin/bash
 cat /var/jenkins_home/secrets/initialAdminPassword
 ```
-
-where `{containerId}` is container id of `jenkins_master`.
 
 Enter the value in the `Administrator password` field and click `Continue`.
 
@@ -133,7 +80,7 @@ Click `Save and Finish`.
 
 Upon completion of account creation you can administer your Jenkins instance manually with `Manage Jenkins`.
 
-All updates are persisted to the `jenkins-data` volume.
+All updates are persisted to the `jenky_data-volume` volume.
 
 
 ## Pre-installing plugins
@@ -141,10 +88,29 @@ All updates are persisted to the `jenkins-data` volume.
 See [Plugin Index](http://updates.jenkins-ci.org/download/plugins/). Add a plugin id for each plugin you wish to install to `plugins.txt`.  You should do this before executing `bootstrap.sh`.  If you wish to install plugins after the image has been built, just do so via `Manage Jenkins > Manage Plugins`.
 
 
-## Notes on jenkins-master image
+## Notes on images and volume
 
-It's based on the offical Jenkins Docker image [here](https://hub.docker.com/_/jenkins/).
+### jenky_master
 
+Based on the official Jenkins Docker image [here](https://hub.docker.com/_/jenkins/).
+
+### jenky_nginx
+
+Based on [Alpine](https://hub.docker.com/_/alpine/) Linux distro [here](https://hub.docker.com/_/nginx/)
+
+### jenky_data-volume
+
+To see volumes
+
+```
+docker volume ls
+```
+
+To remove volume
+
+```
+docker volume rm jenky_data-volume
+```
 
 ## Installing GitHub credentials
 
@@ -157,7 +123,7 @@ Enter a value in `Token description` field. Click on `repo` checkbox. Then click
 
 You will be given a glance at the token.  Copy it!  Store it in a safe location.  You'll need it for the next step.
 
-Visit http://192.168.99.100/credentials/store/system/domain/_/newCredentials
+Visit http://localhost/credentials/store/system/domain/_/newCredentials
 
 ![new-credential](docs/new-credential.png)
 
