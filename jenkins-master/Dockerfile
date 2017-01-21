@@ -50,14 +50,6 @@ RUN DEBIAN_FRONTEND=noninteractive \
     echo 'localhost' > /etc/ansible/hosts && \
     chown -R jenkins:jenkins $ANSIBLE_HOME/
 
-USER jenkins
-
-# Copy in the Docker certs, we'll use /usr/local/etc for them
-COPY certs/ca-key.pem /usr/local/etc/jenkins/certs/ca-key.pem
-COPY certs/ca.pem /usr/local/etc/jenkins/certs/ca.pem
-COPY certs/cert.pem /usr/local/etc/jenkins/certs/cert.pem
-COPY certs/key.pem /usr/local/etc/jenkins/certs/key.pem
-
 ENV PATH=$ANSIBLE_HOME/bin:$PATH \
     PYTHONPATH=$ANSIBLE_HOME/lib:$PYTHONPATH \
     MANPATH=$ANSIBLE_HOME/docs/man:$MANPATH
