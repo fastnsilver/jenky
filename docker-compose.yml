@@ -1,5 +1,5 @@
 # DOCKER COMPOSE CONFIGURATION
-# This file uses the version 3 docker-compose file format, described here:
+# This file uses the version 2 docker-compose file format, described here:
 # https://docs.docker.com/compose/compose-file/#version-2
 
 version: '2'
@@ -7,20 +7,33 @@ version: '2'
 services:
 
   master:
-    build: jenkins-master
+    build: master
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - data-volume:/var/jenkins_home
       - data-volume:/etc/ansible
     ports:
       - "50000:50000"
+    links:
+      - node-slave
+      - openjdk-8-slave
 
   nginx:
-    build: jenkins-nginx
+    build: nginx
     ports:
       - "80:80"
     links:
-      - master:jenkins-master
+      - master:jenky-master
+
+  node-slave:
+    build: slave/node
+    ports:
+      - "22"
+
+  openjdk-8-slave:
+    build: slave/openjdk-8
+    ports:
+      - "22"
 
 volumes:
   data-volume:

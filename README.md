@@ -14,6 +14,7 @@ I couldn't have scraped this together without
 * [Stefan Prodan](https://github.com/stefanprodan/jenkins)
 * [Riot Games Engineering](https://engineering.riotgames.com/news/jenkins-ephemeral-docker-tutorial)
 * [Ryan J. McDonough](https://damnhandy.com/2016/03/06/creating-containerized-build-environments-with-the-jenkins-pipeline-plugin-and-docker-well-almost/)
+* [Alex Ellis](http://blog.alexellis.io/jenkins-2-0-first-impressions/)
 
 
 ## Prerequisites
@@ -98,6 +99,14 @@ Based on the official Jenkins Docker image [here](https://hub.docker.com/_/jenki
 
 Based on [Alpine](https://hub.docker.com/_/alpine/) Linux distro [here](https://hub.docker.com/_/nginx/)
 
+### jenky_node-slave
+
+Based on [Node](https://hub.docker.com/_/node/)
+
+### jenky_openjdk-8-slave
+
+Based on [OpenJDK 8](https://hub.docker.com/_/openjdk/)
+
 ### jenky_data-volume
 
 To see volumes
@@ -111,6 +120,25 @@ To remove volume
 ```
 docker volume rm jenky_data-volume
 ```
+
+## Regarding use of SSH Slaves
+
+You have to build and register your own slaves with master.
+
+### Why not use the Docker Slaves Plugin?
+
+From Nicolas De Loof
+
+> You should not have to bake Jenkins specific images.
+
+You can certainly use the [Docker Slaves plugin](http://blog.loof.fr/2016/04/docker-slaves-jenkins-plugin-has-been.html) but it has some known limitations.
+
+It has [experimental support for the Pipeline plugin](https://github.com/jenkinsci/docker-slaves-plugin#pipeline-job-support).
+
+### Why not use Dockins?
+
+As of 2017-0-24, still a [proof-of-concept](http://dockins.github.io)
+
 
 ## Installing GitHub credentials
 
@@ -134,82 +162,3 @@ Enter the token value in the `Password` field.  The `Username` field's value sho
 
 * Trying to run a "sibling" Docker process as described [here](http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/#the-solution).
 * Executing a GitHub pipeline with `Jenkinsfile` when using the [Cloudbees Docker Pipeline Plugin](https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-inside).
-
-
-## Sample
-
-This sample will build a Java project using Maven, then build and push a Docker image to a Docker registry.
-
-### Dockerfile
-
-This Docker image employs an Alpine Linux Open JDK 8 JRE.
-
-Assume that Spring Boot Maven [plugin](http://docs.spring.io/spring-boot/docs/current/maven-plugin/usage.html) was used to package an executable JAR.  Also note it is in template form so that e.g., during the `process-sources` phase of the Maven life-cycle the `project.*` variables could be [filtered](https://maven.apache.org/plugins/maven-resources-plugin/examples/filter.html) with values from POM via maven-resources
-
-```
-FROM java:openjdk-8-jre-alpine
-MAINTAINER Chris Phillipson
-RUN mkdir -p /opt/@project.artifactId@/bin
-COPY @project.artifactId@-@project.version@-exec.jar /opt/@project.artifactId@/bin
-ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /opt/@project.artifactId@/bin/@project.artifactId@-@project.version@-exec.jar
-```
-
-### Jenkinsfile
-
-Parameters are expected to be declared in the Jenkins job configuration (i.e., Build parameters).
-
-```
-#!groovy
-
-node {
-
-    echo "Running ${env.BUILD_ID} on ${env.JENKINS_URL} with"
-    echoParameters()
-
-    // @see https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-endpoints
-    docker.withRegistry("$DOCKER_REGISTRY_URL", "$DOCKER_CREDENTIALS") {
-
-        stage ('Checkout') {
-            git branch: "$GIT_BRANCH", credentialsId: "$GIT_CREDENTIALS", url: "$GIT_REPO"
-
-            // Get the commit id
-            commit_id = sh(script: 'git rev-parse --verify HEAD', returnStdout: true).trim()
-            echo "COMMIT_ID = " + commit_id
-
-            // Get the email address of committer
-            committer = sh(script: 'git --no-pager show -s --format="%ae" ${commit_id}', returnStdout: true).trim()
-            echo "COMMITER = " + committer
-        }
-
-        stage ('Build JAR') {
-            mvn "clean verify"
-            junit testResults: "**/surefire-reports/*.xml"
-            // publishHTML(target:[allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: "target/site/jacoco", reportFiles: "index.html", reportName: "Jacoco report"])
-        }
-
-        stage ('Build Docker Image') {
-            container = docker.build("$CONTAINER_OWNER/$CONTAINER_NAME:$DEFAULT_TAG", 'target')
-        }
-
-        stage ('Publish Docker Image') {
-            container.push(commit_id)
-        }
-
-    }
-}
-
-def mvn(args) {
-    sh "${tool 'M3'}/bin/mvn ${args}"
-}
-
-def echoParameters() {
-    echo "> GIT_REPO = $GIT_REPO"
-    echo "> GIT_BRANCH = $GIT_BRANCH"
-    echo "> GIT_CREDENTIALS = $GIT_CREDENTIALS"
-    echo "> DOCKER_REGISTRY_URL = $DOCKER_REGISTRY_URL"
-    echo "> DOCKER_CREDENTIALS = $DOCKER_CREDENTIALS"
-    echo "> DEFAULT_TAG = $DEFAULT_TAG"
-    echo "> CONTAINER_OWNER = $CONTAINER_OWNER"
-    echo "> CONTAINER_NAME = $CONTAINER_NAME"
-}
-```

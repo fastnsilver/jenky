@@ -13,6 +13,7 @@ cloudbees-credentials
 credentials
 display-url-api
 docker-custom-build-environment
+docker-slaves
 docker-workflow
 durable-task
 gatling
@@ -54,6 +55,7 @@ simple-theme-plugin
 sms
 sonar
 ssh-credentials
+ssh-slaves
 structs
 swarm
 terraform
