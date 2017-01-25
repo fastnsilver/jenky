@@ -137,7 +137,7 @@ It has [experimental support for the Pipeline plugin](https://github.com/jenkins
 
 ### Why not use Dockins?
 
-As of 2017-0-24, still a [proof-of-concept](http://dockins.github.io)
+As of 2017-01-24, still a [proof-of-concept](http://dockins.github.io)
 
 
 ## Installing GitHub credentials
