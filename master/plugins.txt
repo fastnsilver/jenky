@@ -25,6 +25,7 @@ golang
 gradle
 greenballs
 handlebars
+htmlpublisher
 jacoco
 jclouds-jenkins
 jenkins-cloudformation-plugin

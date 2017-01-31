@@ -15,8 +15,7 @@ services:
     ports:
       - "50000:50000"
     links:
-      - node-slave
-      - openjdk-8-slave
+      - slave
 
   nginx:
     build: nginx
@@ -25,15 +24,12 @@ services:
     links:
       - master:jenky-master
 
-  node-slave:
-    build: slave/node
+  slave:
+    build: slave
     ports:
       - "22"
-
-  openjdk-8-slave:
-    build: slave/openjdk-8
-    ports:
-      - "22"
+    env_file:
+      - ./slave.env
 
 volumes:
   data-volume:

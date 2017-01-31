@@ -1,0 +1,22 @@
+#!/bin/bash
+
+write_key() {
+	mkdir -p /home/jenkins/.ssh
+	echo "$1" > /home/jenkins/.ssh/authorized_keys
+	chown -Rf jenkins:jenkins /home/jenkins/.ssh
+	chmod 0600 /home/jenkins/.ssh/authorized_keys
+	chmod 0700 -R /home/jenkins/.ssh
+}
+
+if [[ $JENKINS_SLAVE_SSH_PUBKEY == ssh-* ]]; then
+  write_key "${JENKINS_SLAVE_SSH_PUBKEY}"
+fi
+if [[ $# -gt 0 ]]; then
+  if [[ $1 == ssh-* ]]; then
+    write_key "$1"
+    shift 1
+  else
+    exec "$@"
+  fi
+fi
+exec /usr/sbin/sshd -D $@

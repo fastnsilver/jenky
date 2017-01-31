@@ -47,11 +47,15 @@ You're on a Mac (aren't you?). Install [Docker for Mac](https://download.docker.
 
 ## Prep Jenkins instance for first use
 
+Create a new SSH key as described [here](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/). Name your private key `jenky_rsa`.
+
+Run the following shell script
+
 ```
 ./bootstrap.sh
 ```
 
-Visit `http://localhost`.
+Visit `http://localhost`. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
 
 You will be prompted to enter a password that is to be retrieved from startup log.
 
@@ -99,13 +103,9 @@ Based on the official Jenkins Docker image [here](https://hub.docker.com/_/jenki
 
 Based on [Alpine](https://hub.docker.com/_/alpine/) Linux distro [here](https://hub.docker.com/_/nginx/)
 
-### jenky_node-slave
+### jenky_slave
 
-Based on [Node](https://hub.docker.com/_/node/)
-
-### jenky_openjdk-8-slave
-
-Based on [OpenJDK 8](https://hub.docker.com/_/openjdk/)
+Based on [OpenJDK 8](https://hub.docker.com/_/openjdk/) and modeled closely after [jenkinsci/docker-ssh-slave](github.com/jenkinsci/docker-ssh-slave)
 
 ### jenky_data-volume
 
