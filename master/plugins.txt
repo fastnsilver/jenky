@@ -1,6 +1,7 @@
 ace-editor
 ant
 ansible
+artifactory
 blueocean
 blueocean-git-pipeline
 blueocean-github-pipeline
