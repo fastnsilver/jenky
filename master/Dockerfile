@@ -1,5 +1,5 @@
 # @see https://github.com/jenkinsci/docker/blob/master/Dockerfile
-FROM jenkins:2.32.1
+FROM jenkins/jenkins:2.89.2
 MAINTAINER Chris Phillipson <fastnsilver@gmail.com>
 
 # Install default plugins
