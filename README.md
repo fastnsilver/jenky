@@ -43,6 +43,20 @@ git clone git@github.com:fastnsilver/jenky.git
 ## Installing Docker for Mac
 
 You're on a Mac (aren't you?). Install [Docker for Mac](https://download.docker.com/mac/stable/Docker.dmg).
+Note: Docker Compose also happens to come with Docker for Mac.
+
+## Installing Docker for Linux
+
+Do yourself a favor and spin up an [Ubuntu 16.04 LTS](http://releases.ubuntu.com/16.04/) Linux VM on Azure, AWS, or GCP. Then follow installation and pos-installation instructions:
+
+* [Installation](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-convenience-script)
+* [Post-installation](https://docs.docker.com/engine/installation/linux/linux-postinstall/)
+
+To install Docker Compose, consult [these instructions](https://docs.docker.com/compose/install/).
+
+Finally, you will need to add port 8081 in addition to port 80 to your provider's Firewall ingress rules if you intend to spin up an instance of Artifactory along with Jenkins.
+ 
+ > For an example of how to get this done on GCP, consult this Stack Overflow [post](https://stackoverflow.com/questions/21065922/how-to-open-a-specific-port-such-as-9090-in-google-compute-engine)
 
 
 ## Prep Jenkins instance for first use
