@@ -69,7 +69,7 @@ Run the following shell script
 ./bootstrap.sh
 ```
 
-Visit `http://localhost`. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
+Visit `http://localhost` or the public IP address of the VM hosting your installation. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
 
 You will be prompted to enter a password that is to be retrieved from startup log.
 
