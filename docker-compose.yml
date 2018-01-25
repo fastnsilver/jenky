@@ -1,17 +1,100 @@
-# DOCKER COMPOSE CONFIGURATION
-# This file uses the version 2 docker-compose file format, described here:
-# https://docs.docker.com/compose/compose-file/#version-2
-
-version: '2'
+version: '3.1'
 
 services:
+
+  frog-db:
+    image: postgres:10.1
+    container_name: artifactory-db
+    ports:
+     - 5432:5432
+    environment:
+     - POSTGRES_DB=artifactory
+     # The following must match the DB_USER and DB_PASSWORD values passed to Artifactory
+     - POSTGRES_USER=artifactory
+     - POSTGRES_PASSWORD=artifactory
+    volumes:
+     - frog-db-volume:/var/lib/postgresql/data
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+
+  sonar-db:
+    image: postgres:10.1
+    container_name: sonarqube-db
+    ports:
+     - 5433:5432
+    environment:
+     - POSTGRES_DB=sonar
+     # The following must match the SONARQUBE_JDBC_USERNAME and SONARQUBE_JDBC_PASSWORD values passed to SonarQube
+     - POSTGRES_USER=sonar
+     - POSTGRES_PASSWORD=sonar
+    volumes:
+     - sonar-db-volume:/var/lib/postgresql/data
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-oss:5.8.3
+    container_name: artifactory
+    ports:
+     - 8081:8081
+    depends_on:
+     - frog-db
+    links:
+     - frog-db
+    volumes:
+     - artifactory-volume:/var/opt/jfrog/artifactory
+    environment:
+     - DB_TYPE=postgresql
+     # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to frog-db
+     - DB_USER=artifactory
+     - DB_PASSWORD=artifactory
+     # Add extra Java options by uncommenting the following line
+     #- EXTRA_JAVA_OPTIONS=-Xmx4g
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
+
+  sonarqube:
+    image: sonarqube:lts-alpine
+    container_name: sonarqube
+    ports:
+     - 9000:9000
+     - 9092:9092
+    depends_on:
+     - sonar-db
+    links:
+     - sonar-db
+    volumes:
+     - sonarqube-volume:/var/lib/sonarqube/data
+    environment:
+     # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to frog-db
+     - SONARQUBE_JDBC_USERNAME=sonar
+     - SONARQUBE_JDBC_PASSWORD=sonar
+     - SONARQUBE_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+    restart: always
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 32000
+        hard: 40000
 
   master:
     build: master
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - data-volume:/var/jenkins_home
-      - data-volume:/etc/ansible
+      - jenkins-volume:/var/jenkins_home
+      - jenkins-volume:/etc/ansible
     ports:
       - "50000:50000"
     links:
@@ -30,6 +113,14 @@ services:
       - "22"
     env_file:
       - ./slave.env
+    links:
+      - artifactory
+      - sonarqube
 
 volumes:
-  data-volume:
+  jenkins-volume:
+  sonarqube-volume:
+  sonar-db-volume:
+  artifactory-volume:
+  frog-db-volume:
+  
