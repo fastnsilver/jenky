@@ -48,7 +48,7 @@ services:
     depends_on:
      - frog-db
     links:
-     - frog-db
+     - frog-db:postgresql
     volumes:
      - artifactory-volume:/var/opt/jfrog/artifactory
     environment:
