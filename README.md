@@ -15,6 +15,8 @@ I couldn't have scraped this together without
 * [Riot Games Engineering](https://engineering.riotgames.com/news/jenkins-ephemeral-docker-tutorial)
 * [Ryan J. McDonough](https://damnhandy.com/2016/03/06/creating-containerized-build-environments-with-the-jenkins-pipeline-plugin-and-docker-well-almost/)
 * [Alex Ellis](http://blog.alexellis.io/jenkins-2-0-first-impressions/)
+* [Soheil Hassas Yeganeh](https://gist.github.com/soheilhy/8b94347ff8336d971ad0)
+* [Evert Ramos](https://github.com/evertramos/docker-compose-letsencrypt-nginx-proxy-companion)
 
 
 ## Prerequisites
@@ -63,13 +65,23 @@ Finally, you will need to add port 8081 in addition to port 80 to your provider'
 
 Create a new SSH key as described [here](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/). Name your private key `jenky_rsa`.
 
-Run the following shell script
+Run the following shell scripts
+
+### Local
+
+```
+./bootstrap-local.sh
+```
+
+### Public cloud hosted
+
+Before executing the script you will need to edit `hosts.env` and update all occurrences of `replace_with_*`
 
 ```
 ./bootstrap.sh
 ```
 
-Visit `http://localhost` or the public IP address of the VM hosting your installation. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
+Visit `http://localhost:8080` or the hostname/public IP address of the VM hosting your installation. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
 
 You will be prompted to enter a password that is to be retrieved from startup log.
 
@@ -78,7 +90,7 @@ You will be prompted to enter a password that is to be retrieved from startup lo
 To find it
 
 ```
-docker exec master /bin/bash
+docker exec jenkins-master /bin/bash
 cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
@@ -129,10 +141,10 @@ To see volumes
 docker volume ls
 ```
 
-To remove volume
+To prune volume
 
 ```
-docker volume rm jenky_data-volume
+docker volume prune
 ```
 
 ## Regarding use of SSH Slaves
@@ -171,6 +183,20 @@ Create [new credentials](http://localhost/credentials/store/system/domain/_/newC
 
 Enter the token value in the `Password` field.  The `Username` field's value should be your GitHub account.  All other field values are flexible.
 
+## Sonarqube and Artifactory
+
+Yes! This Docker Compose cluster also stands up instances of Artifactory and SonarQube.
+
+### Local
+
+* Artifactory `http://localhost:8081`
+* SonarQube `http://localhost:9000`
+
+### Public cloud hosted
+
+See `hosts.env`.  Access to these instances will be whatever you configured for `ARTIFACTORY_HOST` and `SONARQUBE_HOST`.
+
+> Re: DNSSEC.  If you enable DNSSSEC then be sure to verify that your domain registrar and all downstream NS providers support it! Otherwise LetsEncrypt will not properly vend certificates resulting in a dysfunctional Nginx proxy configuration. (E.g., Your domain registrar is Hover (no DNSSEC support) and you manage a sub-domain with DNSSEC enabled on a Cloud DNS zone on Google Cloud Platform).
 
 ## Background
 

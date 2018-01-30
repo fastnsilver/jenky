@@ -1,20 +1,16 @@
 #!/bin/bash
 
 #
-# This file should be used to prepare and run your WebProxy after setting up your .env file
+# This file should be used to restart your WebProxy
 # Source: https://github.com/evertramos/docker-compose-letsencrypt-nginx-proxy-companion
 #
 
 # Startup NGINX proxy with SSL termination
 cd .proxy
-git clone https://github.com/evertramos/docker-compose-letsencrypt-nginx-proxy-companion.git .
-rm -Rf .git .github .gitignore nginx.tmpl
-cp ../jenky.proxied.env .env
 ./start.sh
 
 # Startup Jenky
 cd ..
-echo "JENKINS_SLAVE_SSH_PUBKEY="`cat ~/.ssh/jenky_rsa.pub` > slave.env
 
 if [ -e hosts.env ]; then
     source hosts.env

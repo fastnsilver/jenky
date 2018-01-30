@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.0'
 
 services:
 
@@ -6,7 +6,7 @@ services:
     image: postgres:10.1
     container_name: artifactory-db
     ports:
-      - 5432:5432
+      - "5432"
     environment:
       - POSTGRES_DB=artifactory
       # The following must match the DB_USER and DB_PASSWORD values passed to Artifactory
@@ -20,7 +20,7 @@ services:
     image: postgres:10.1
     container_name: sonarqube-db
     ports:
-      - 5433:5432
+      - "5432"
     environment:
       - POSTGRES_DB=sonar
       # The following must match the SONARQUBE_JDBC_USERNAME and SONARQUBE_JDBC_PASSWORD values passed to SonarQube
@@ -34,7 +34,7 @@ services:
     image: docker.bintray.io/jfrog/artifactory-oss:5.8.3
     container_name: artifactory
     ports:
-      - 8081:8081
+      - "8081"
     depends_on:
       - frog-db
     links:
@@ -48,25 +48,38 @@ services:
       - DB_PASSWORD=artifactory
       # Add extra Java options by uncommenting the following line
       #- EXTRA_JAVA_OPTIONS=-Xmx4g
+      - VIRTUAL_HOST=${ARTIFACTORY_HOST}
+      - VIRTUAL_PORT=8081
+      - HTTPS_METHOD=nohttp
+      - SSL_POLICY=Mozilla-Modern
+      - LETSENCRYPT_HOST=${ARTIFACTORY_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
     restart: always
 
   sonarqube:
     image: sonarqube:lts-alpine
     container_name: sonarqube
     ports:
-      - 9000:9000
-      - 9092:9092
+      - "9000"
+      - "9092"
     depends_on:
       - sonar-db
     links:
       - sonar-db
     volumes:
       - sonarqube:/var/lib/sonarqube/data
+    restart: always
     environment:
       # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to frog-db
       - SONARQUBE_JDBC_USERNAME=sonar
       - SONARQUBE_JDBC_PASSWORD=sonar
       - SONARQUBE_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+      - VIRTUAL_HOST=${SONARQUBE_HOST}
+      - VIRTUAL_PORT=9000
+      - HTTPS_METHOD=nohttp
+      - SSL_POLICY=Mozilla-Modern
+      - LETSENCRYPT_HOST=${SONARQUBE_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
     restart: always
 
   jenkins-master:
@@ -77,11 +90,17 @@ services:
       - jenkins:/var/jenkins_home
       - jenkins:/etc/ansible
     ports:
-      - 8080:8080
-      - 50000:50000
+      - "8080"
+      - "50000"
     links:
       - jenkins-slave
-    restart: always
+    environment:
+      - VIRTUAL_HOST=${JENKINS_HOST}
+      - VIRTUAL_PORT=8080
+      - HTTPS_METHOD=nohttp
+      - SSL_POLICY=Mozilla-Modern
+      - LETSENCRYPT_HOST=${JENKINS_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
 
   jenkins-slave:
     build: slave
@@ -95,10 +114,14 @@ services:
       - sonarqube
     restart: always
 
+networks:
+  default:
+    external:
+      name: ${SERVICE_NETWORK:-webproxy}
+      
 volumes:
   jenkins:
   sonarqube:
   sonar-db:
   artifactory:
   frog-db:
-  
