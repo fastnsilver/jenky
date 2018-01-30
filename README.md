@@ -71,6 +71,8 @@ Run the following shell scripts
 ./bootstrap-local.sh
 ```
 
+Visit `http://localhost:8080`. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like `http://192.68.99.100:8080`).
+
 ### Public cloud hosted
 
 Before executing the script you will need to edit `hosts.env` and update all occurrences of `replace_with_*`
@@ -79,7 +81,7 @@ Before executing the script you will need to edit `hosts.env` and update all occ
 ./bootstrap.sh
 ```
 
-Visit `http://localhost:8080` or the hostname/public IP address of the VM hosting your installation. (Or if you happen to be running Docker Toolbox, you're in a VM, so your IP address will be something like 192.68.99.100).
+Visit the hostname (see `$JENKINS_HOST` in `hosts.env`) of the VM hosting your installation. (Only HTTPS ingress is allowed). 
 
 You will be prompted to enter a password that is to be retrieved from startup log.
 
@@ -181,18 +183,19 @@ Create [new credentials](http://localhost/credentials/store/system/domain/_/newC
 
 Enter the token value in the `Password` field.  The `Username` field's value should be your GitHub account.  All other field values are flexible.
 
-## Sonarqube and Artifactory
+## Concourse, Sonarqube and Artifactory
 
-Yes! This Docker Compose cluster also stands up instances of Artifactory and SonarQube.
+Yes! This Docker Compose cluster also stands up instances of Concourse, Artifactory and SonarQube.
 
 ### Local
 
+* Concourse `http://localhost:9090`
 * Artifactory `http://localhost:8081`
 * SonarQube `http://localhost:9000`
 
 ### Public cloud hosted
 
-See `hosts.env`.  Access to these instances will be whatever you configured for `ARTIFACTORY_HOST` and `SONARQUBE_HOST`.
+See `hosts.env`.  Access to these instances will be whatever you configured for `CONCOURSE_HOST`, `ARTIFACTORY_HOST` and `SONARQUBE_HOST`.
 
 > Re: DNSSEC.  If you enable DNSSEC then be sure to verify that your domain registrar and all downstream NS providers support it! Otherwise LetsEncrypt will not properly vend certificates resulting in a dysfunctional Nginx proxy configuration. (E.g., Your domain registrar is Hover (no DNSSEC support) and you manage a sub-domain with DNSSEC enabled on a Cloud DNS zone on Google Cloud Platform).
 

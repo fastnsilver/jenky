@@ -14,7 +14,6 @@ services:
       - POSTGRES_PASSWORD=artifactory
     volumes:
       - frog-db:/var/lib/postgresql/data
-    restart: unless-stopped
 
   sonar-db:
     image: postgres:10.1
@@ -28,7 +27,6 @@ services:
       - POSTGRES_PASSWORD=sonar
     volumes:
       - sonar-db:/var/lib/postgresql/data
-    restart: unless-stopped
 
   artifactory:
     image: docker.bintray.io/jfrog/artifactory-oss:5.8.3
@@ -54,7 +52,7 @@ services:
       - SSL_POLICY=Mozilla-Modern
       - LETSENCRYPT_HOST=${ARTIFACTORY_HOST}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
-    restart: always
+    restart: unless-stopped
 
   sonarqube:
     image: sonarqube:lts-alpine
@@ -80,7 +78,7 @@ services:
       - SSL_POLICY=Mozilla-Modern
       - LETSENCRYPT_HOST=${SONARQUBE_HOST}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
-    restart: always
+    restart: unless-stopped
 
   jenkins-master:
     build: master
@@ -101,6 +99,7 @@ services:
       - SSL_POLICY=Mozilla-Modern
       - LETSENCRYPT_HOST=${JENKINS_HOST}
       - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
+    restart: unless-stopped
 
   jenkins-slave:
     build: slave
@@ -112,7 +111,60 @@ services:
     links:
       - artifactory
       - sonarqube
-    restart: always
+
+  concourse-db:
+    image: postgres:10.1
+    container_name: concourse-db
+    environment:
+      - POSTGRES_DB=concourse
+      - POSTGRES_USER=concourse
+      - POSTGRES_PASSWORD=concourse
+      - PGDATA=/database
+    volumes:
+      - concourse-db:/var/lib/postgresql/data
+
+  concourse-web:
+    image: concourse/concourse
+    container_name: concourse-web
+    links: 
+      - concourse-db
+    command: web
+    depends_on: 
+      - concourse-db
+    ports: 
+      - "8080"
+    volumes: 
+      - ./keys/web:/concourse-keys
+    environment:
+      - CONCOURSE_BASIC_AUTH_USERNAME=admin
+      - CONCOURSE_BASIC_AUTH_PASSWORD=admin
+      - CONCOURSE_EXTERNAL_URL="https://${CONCOURSE_HOST}"
+      - CONCOURSE_POSTGRES_HOST=concourse-db
+      - CONCOURSE_POSTGRES_USER=concourse
+      - CONCOURSE_POSTGRES_PASSWORD=concourse
+      - CONCOURSE_POSTGRES_DATABASE=concourse
+      - VIRTUAL_HOST=${CONCOURSE_HOST}
+      - VIRTUAL_PORT=8080
+      - HTTPS_METHOD=nohttp
+      - SSL_POLICY=Mozilla-Modern
+      - LETSENCRYPT_HOST=${CONCOURSE_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL_RECIPIENT}
+    restart: unless-stopped
+      
+
+  concourse-worker:
+    image: concourse/concourse
+    container_name: concourse-worker
+    privileged: true
+    links: 
+      - concourse-web
+    depends_on: 
+      - concourse-web
+    command: worker
+    volumes: 
+      - ./keys/worker:/concourse-keys
+    environment:
+      - CONCOURSE_TSA_HOST=concourse-web
 
 networks:
   default:
@@ -121,6 +173,7 @@ networks:
       
 volumes:
   jenkins:
+  concourse-db:
   sonarqube:
   sonar-db:
   artifactory:

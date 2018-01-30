@@ -8,7 +8,7 @@ read -n1 -r -p "This script will stop all running containers then remove all unu
 if [ "$key" = 'y' ] || [ "$key" = 'Y' ]; then
     docker stop $(docker ps -a -q)
     docker system prune -a -f
-    sudo rm -Rf /tmp/nginx .proxy
+    sudo rm -Rf /tmp/nginx .proxy keys
     mkdir .proxy
     rm slave.env
     printf "\nCompleted operation.\n"

@@ -1,4 +1,4 @@
-FROM openjdk:8-jdk
+FROM openjdk:8u151-jdk
 
 MAINTAINER Chris Phillipson <fastnsilver@gmail.com>
 
