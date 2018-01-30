@@ -3,7 +3,7 @@
 ![](http://i.imgur.com/KC6TAD3.png)
 
 A configurable Docker-ized instance of Jenkins fronted by Nginx.
-Convenient for vetting builds in a local development environment.
+Convenient for vetting builds in a local development environment. And robust enough to host a secure production CI/CD environment in the cloud.
 
 ## Credits
 
