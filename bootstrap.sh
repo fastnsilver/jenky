@@ -6,6 +6,7 @@
 #
 
 # Startup NGINX proxy with SSL termination
+mkdir -p .proxy
 cd .proxy
 git clone https://github.com/evertramos/docker-compose-letsencrypt-nginx-proxy-companion.git .
 rm -Rf .git .github .gitignore nginx.tmpl
