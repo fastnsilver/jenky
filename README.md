@@ -196,7 +196,7 @@ Yes! This Docker Compose cluster also stands up instances of Artifactory and Son
 
 See `hosts.env`.  Access to these instances will be whatever you configured for `ARTIFACTORY_HOST` and `SONARQUBE_HOST`.
 
-> Re: DNSSEC.  If you enable DNSSSEC then be sure to verify that your domain registrar and all downstream NS providers support it! Otherwise LetsEncrypt will not properly vend certificates resulting in a dysfunctional Nginx proxy configuration. (E.g., Your domain registrar is Hover (no DNSSEC support) and you manage a sub-domain with DNSSEC enabled on a Cloud DNS zone on Google Cloud Platform).
+> Re: DNSSEC.  If you enable DNSSEC then be sure to verify that your domain registrar and all downstream NS providers support it! Otherwise LetsEncrypt will not properly vend certificates resulting in a dysfunctional Nginx proxy configuration. (E.g., Your domain registrar is Hover (no DNSSEC support) and you manage a sub-domain with DNSSEC enabled on a Cloud DNS zone on Google Cloud Platform).
 
 ## Background
 
