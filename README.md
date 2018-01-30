@@ -57,10 +57,7 @@ Do yourself a favor and spin up an [Ubuntu 16.04 LTS](http://releases.ubuntu.com
 
 To install Docker Compose, consult [these instructions](https://docs.docker.com/compose/install/).
 
-Finally, you will need to add port 8081 in addition to port 80 to your provider's Firewall ingress rules if you intend to spin up an instance of Artifactory along with Jenkins.
- 
- > For an example of how to get this done on GCP, consult this Stack Overflow [post](https://stackoverflow.com/questions/21065922/how-to-open-a-specific-port-such-as-9090-in-google-compute-engine)
-
+> Your VM should have port 443 (HTTPS) ingress rule assigned.
 
 ## Prep Jenkins instance for first use
 
