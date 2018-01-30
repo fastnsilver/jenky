@@ -21,9 +21,10 @@ I couldn't have scraped this together without
 
 ## Prerequisites
 
-* Docker for Mac
+* Docker
+* Docker Compose
 
-If you happened to have previously installed [Docker Toolbox](https://www.docker.com/products/docker-toolbox), it will happily [co-exist](https://docs.docker.com/docker-for-mac/docker-toolbox/) with Docker for Mac.
+> for Mac users: if you happened to have previously installed [Docker Toolbox](https://www.docker.com/products/docker-toolbox), it will happily [co-exist](https://docs.docker.com/docker-for-mac/docker-toolbox/) with [Docker for Mac](https://www.docker.com/docker-mac).
 
 
 ## How to obtain the source
