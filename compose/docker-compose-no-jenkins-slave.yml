@@ -1,0 +1,136 @@
+version: '3.0'
+
+services:
+
+  frog-db:
+    image: postgres:10.1
+    container_name: artifactory-db
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_DB=artifactory
+      # The following must match the DB_USER and DB_PASSWORD values passed to Artifactory
+      - POSTGRES_USER=artifactory
+      - POSTGRES_PASSWORD=artifactory
+    volumes:
+      - frog-db:/var/lib/postgresql/data
+
+  sonar-db:
+    image: postgres:10.1
+    container_name: sonarqube-db
+    ports:
+      - 5433:5432
+    environment:
+      - POSTGRES_DB=sonar
+      # The following must match the SONARQUBE_JDBC_USERNAME and SONARQUBE_JDBC_PASSWORD values passed to SonarQube
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+    volumes:
+      - sonar-db:/var/lib/postgresql/data
+
+  artifactory:
+    image: docker.bintray.io/jfrog/artifactory-oss:5.8.3
+    container_name: artifactory
+    ports:
+      - 8081:8081
+    depends_on:
+      - frog-db
+    links:
+      - frog-db:postgresql
+    volumes:
+      - artifactory:/var/opt/jfrog/artifactory
+    environment:
+      - DB_TYPE=postgresql
+      # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to frog-db
+      - DB_USER=artifactory
+      - DB_PASSWORD=artifactory
+      # Add extra Java options by uncommenting the following line
+      #- EXTRA_JAVA_OPTIONS=-Xmx4g
+    restart: unless-stopped
+
+  sonarqube:
+    image: sonarqube:lts-alpine
+    container_name: sonarqube
+    ports:
+      - 9000:9000
+      - 9092:9092
+    depends_on:
+      - sonar-db
+    links:
+      - sonar-db
+    volumes:
+      - sonarqube:/var/lib/sonarqube/data
+    environment:
+      # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to frog-db
+      - SONARQUBE_JDBC_USERNAME=sonar
+      - SONARQUBE_JDBC_PASSWORD=sonar
+      - SONARQUBE_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+    restart: unless-stopped
+
+  jenkins-master:
+    build: master
+    container_name: jenkins-master
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins:/var/jenkins_home
+      - jenkins:/etc/ansible
+    ports:
+      - 8080:8080
+      - 50000:50000
+    restart: unless-stopped
+    links:
+      - artifactory
+      - sonarqube
+
+  concourse-db:
+    image: postgres:10.1
+    environment:
+      - POSTGRES_DB=concourse
+      - POSTGRES_USER=concourse
+      - POSTGRES_PASSWORD=concourse
+      - PGDATA=/database
+    volumes:
+      - concourse-db:/var/lib/postgresql/data
+
+  concourse-web:
+    image: concourse/concourse
+    links: 
+      - concourse-db
+    command: web
+    depends_on: 
+      - concourse-db
+    ports: 
+      - 9090:8080
+    volumes: 
+      - ./keys/web:/concourse-keys
+    environment:
+      - CONCOURSE_BASIC_AUTH_USERNAME=admin
+      - CONCOURSE_BASIC_AUTH_PASSWORD=admin
+      - CONCOURSE_EXTERNAL_URL="${CONCOURSE_EXTERNAL_URL}"
+      - CONCOURSE_POSTGRES_HOST=concourse-db
+      - CONCOURSE_POSTGRES_USER=concourse
+      - CONCOURSE_POSTGRES_PASSWORD=concourse
+      - CONCOURSE_POSTGRES_DATABASE=concourse
+    restart: unless-stopped
+
+  concourse-worker:
+    image: concourse/concourse
+    privileged: true
+    links: 
+      - concourse-web
+    depends_on: 
+      - concourse-web
+    command: worker
+    volumes: 
+      - ./keys/worker:/concourse-keys
+    environment:
+      - CONCOURSE_TSA_HOST=concourse-web
+
+volumes:
+  jenkins:
+  concourse-db:
+  sonarqube:
+  sonar-db:
+  artifactory:
+  frog-db:
+  
