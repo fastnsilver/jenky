@@ -34,8 +34,9 @@ git clone https://github.com/fastnsilver/jenky.git
 git clone git@github.com:fastnsilver/jenky.git
 ```
 
+## Getting started
 
-## Background
+Pick your favorite container orchestrator
 
-* Trying to run a "sibling" Docker process as described [here](http://jpetazzo.github.io/2015/09/03/do-not-use-docker-in-docker-for-ci/#the-solution).
-* Executing a GitHub pipeline with `Jenkinsfile` when using the [Cloudbees Docker Pipeline Plugin](https://go.cloudbees.com/docs/cloudbees-documentation/cje-user-guide/index.html#docker-workflow-sect-inside).
+* [Docker Compose](compose/README.md)
+* [Kubernetes + Helm](k8s/README.md)
