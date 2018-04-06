@@ -124,7 +124,7 @@ services:
       - concourse-db:/var/lib/postgresql/data
 
   concourse-web:
-    image: concourse/concourse
+    image: concourse/concourse:3.9.0
     container_name: concourse-web
     links: 
       - concourse-db
@@ -153,7 +153,7 @@ services:
       
 
   concourse-worker:
-    image: concourse/concourse
+    image: concourse/concourse:3.9.0
     container_name: concourse-worker
     privileged: true
     links: 
