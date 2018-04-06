@@ -103,7 +103,7 @@ services:
       - concourse-db:/var/lib/postgresql/data
 
   concourse-web:
-    image: concourse/concourse
+    image: concourse/concourse:3.9.0
     links: 
       - concourse-db
     command: web
@@ -124,7 +124,7 @@ services:
     restart: unless-stopped
 
   concourse-worker:
-    image: concourse/concourse
+    image: concourse/concourse:3.9.0
     privileged: true
     links: 
       - concourse-web
