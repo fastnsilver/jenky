@@ -3,7 +3,7 @@ version: '3.0'
 services:
 
   frog-db:
-    image: postgres:10.1
+    image: postgres:10.5-alpine
     container_name: artifactory-db
     ports:
       - "5432"
@@ -16,7 +16,7 @@ services:
       - frog-db:/var/lib/postgresql/data
 
   sonar-db:
-    image: postgres:10.1
+    image: postgres:10.5-alpine
     container_name: sonarqube-db
     ports:
       - "5432"
@@ -29,7 +29,7 @@ services:
       - sonar-db:/var/lib/postgresql/data
 
   artifactory:
-    image: docker.bintray.io/jfrog/artifactory-oss:5.8.3
+    image: docker.bintray.io/jfrog/artifactory-oss:6.2.0
     container_name: artifactory
     ports:
       - "8081"
@@ -113,7 +113,7 @@ services:
       - sonarqube
 
   concourse-db:
-    image: postgres:10.1
+    image: postgres:10.5-alpine
     container_name: concourse-db
     environment:
       - POSTGRES_DB=concourse
@@ -124,7 +124,7 @@ services:
       - concourse-db:/var/lib/postgresql/data
 
   concourse-web:
-    image: concourse/concourse:3.9.0
+    image: concourse/concourse:4.0.0
     container_name: concourse-web
     links: 
       - concourse-db
@@ -153,7 +153,7 @@ services:
       
 
   concourse-worker:
-    image: concourse/concourse:3.9.0
+    image: concourse/concourse:4.0.0
     container_name: concourse-worker
     privileged: true
     links: 
